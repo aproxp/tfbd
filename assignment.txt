@@ -1,6 +1,6 @@
 Ex 1.1  tr -s '[[:punct:][:space:]]' '\n' < rfc1450 | sort | uniq -c | sort -rn | head -10
 
-Ex 1.2 awk ' <= 10000' cars.txt | sort -rn -k5,5
+Ex 1.2 awk '$5 <= 10000' cars.txt | sort -rn -k5,5
 
 Ex 1.3  cat > temp.txt & tr -s '[[:punct:][:space:]]' '\n' < temp.txt > temp.txt 
 | sort | comm -13 temp.txt dict_sort.txt 

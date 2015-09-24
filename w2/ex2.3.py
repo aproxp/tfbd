@@ -8,7 +8,7 @@ __author__ = 'kmalarski'
 
 import json
 
-with open("/home/kmalarski/Desktop/DTU/bigdata/tfbd_w2/tfbd_w2/pizza-train.json") as file:
+with open("pizza-train") as file:
     content = json.loads(file.read())
 
 

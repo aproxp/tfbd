@@ -1,10 +1,3 @@
-"""
-Write a script that reads in this list of points (x,y), fits/interpolates them with a polynomial of degree 3.
- Solve for the (real) roots of the polynomial numerically using Scipy’s optimization functions
- (not the root function in Numpy).
-"""
-__author__ = 'kmalarski'
-
 points = []
 
 with open("/home/kmalarski/Desktop/DTU/bigdata/list.txt") as file:
@@ -19,13 +12,13 @@ Y = [float(points[i][1]) for i in range(len(points))]
 x = numpy.array(X)
 y = numpy.array(Y)
 
-# print(X, Y)
-
 poly = numpy.polyfit(x, y, 3)
 
-root = scipy.optimize.root(poly, 0)
 
+def f(x, a, b, c, d):
+    return a*x**3 + b*x**2 + c*x + d
 
-print(poly)
-# print(points[0][1])
+root = scipy.optimize.root(f, 8, args=(poly[0], poly[1], poly[2], poly[3]))
+
+print(root)
 

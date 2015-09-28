@@ -1,0 +1,14 @@
+In order to implement DBSCAN algorithm we introduced 2 classes. 
+1) Point class was created to join the information about dimension values and some additional data about point's membership to a cluster and whether the point is outlier or not. 
+2) Cluster class corresponds to a notion of point cluster and contains a list of its member points. Moreover, a function that expands a cluster by new points is also a Cluster class function.
+
+The algorithm is written in accordance with the pseudocode description from wikipedia page. Firstly, the input data is parsed into numpy array and then it is replaced by a matrix of Point objects. dbscan function is supposed to return a list of clusters and uses compute_jaccard_distance, a simple element-wise jaccard distance calculation function, for finding core points and density neighbours. 
+
+We conducted the following tests:
+
+Points x Dims: result (clusters), biggest cluster size, execution time.
+10 x 10: 4 (3 clusters), 4 points. 65743 us
+100 x 100: 6 (5 clusters), 24 points. 1.395 s
+1000 x 1000: 9 (8 clusters), 289 points. 22min:51s 
+
+Unfortunately, our version of DBSCAN is not optimised enough to allow us testing bigger data sets - as it can be seen, with the rate of execution time increase, 1000 x 1000 data set would be processed for many weeks! On the other hand we think that our code uses is object-oriented being therefore easy to read and understandable.

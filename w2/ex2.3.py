@@ -5,7 +5,6 @@ and construct a bag of words representation of the string (string to count-list)
 """
 __author__ = 'kmalarski'
 
-
 import json
 
 with open("pizza-train") as file:
@@ -31,6 +30,7 @@ def make_bow(data):
     count_list = [[0] * len(bow) for _ in range(len(data))]
     return bow, count_list
 
+
 bow, cnt_list = make_bow(content)
 
 
@@ -40,11 +40,25 @@ def update_count_list(input_text, bag, count_list, text_index):
         if word in bag:
             count_list[text_index][bag.index(word)] += 1
 
+
 cur_text_index = 0
 for dictionary in content:
     update_count_list(dictionary['request_text'], bow, cnt_list, cur_text_index)
 
     cur_text_index += 1
 
-print(cnt_list[0])
-print(cnt_list[-1])
+max_1 = 0
+for i in cnt_list[0]:
+    if i > max_1:
+        max_1 = i
+
+max_2 = 0
+for i in cnt_list[-1]:
+    if i > max_2:
+        max_2 = i
+print(bow)
+print(bow[cnt_list[0].index(max_1)])
+print(bow[cnt_list[-1].index(max_2)])
+
+
+

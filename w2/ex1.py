@@ -2,7 +2,6 @@
 
 import sys
 
-
 def read_matrix(file_name):
     with open(file_name, 'r') as file:
         array = []

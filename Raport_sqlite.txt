@@ -1,0 +1,280 @@
+﻿SQLite
+
+IMPORTANT NOTE: we decided to put SQL queries within the text, whether all the Python code is  placed in APPENDIX A.
+
+Ex5.1
+
+We established connection with Northwind database and we executed some queries to check it out. 
+Using Python3's sqlite3 package we performed several SQL queries, presented below:
+
+SELECT LastName, FirstName FROM Employees
+SELECT * FROM Employees WHERE EmployeeID = 1
+SELECT FirstName FROM Employees ORDER BY FirstName ASC
+
+The output of the queries shown above was:
+
+5.1
+[('Davolio', 'Nancy'), ('Fuller', 'Andrew'), ('Leverling', 'Janet'), ('Peacock', 'Margaret'), ('Buchanan', 'Steven'), ('Suyama', 'Michael'), ('King', 'Robert'), ('Callahan', 'Laura'), ('Dodsworth', 'Anne')]
+
+(1, 'Davolio', 'Nancy', 'Sales Representative', 'Ms.', '1948-12-08', '1992-05-01', '507 - 20th Ave. E.Apt. 2A', 'Seattle', 'WA', '98122', 'USA', '(206) 555-9857', '5467', … output too long to show)
+
+[('Andrew',), ('Anne',), ('Janet',), ('Laura',), ('Margaret',), ('Michael',), ('Nancy',), ('Robert',), ('Steven',)]
+
+Ex5.2
+
+In order to retrieve information about ALFKI's orders we formulated the following SQL query:
+
+SELECT pr.ProductName, od.UnitPrice, od.Quantity, od.OrderID  FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID WHERE o.CustomerID = "ALFKI"
+
+Then we printed the results of the query in such a form:
+
+5.2
+Order number 10643:
+Product Name: Rössle Sauerkraut Unit Price: 45.6 Quantity: 15 
+Product Name: Chartreuse verte Unit Price: 18 Quantity: 21 
+Product Name: Spegesild Unit Price: 12 Quantity: 2 
+Order number 10692:
+Product Name: Vegie-spread Unit Price: 43.9 Quantity: 20 
+Order number 10702:
+Product Name: Aniseed Syrup Unit Price: 10 Quantity: 6 
+Product Name: Lakkalikööri Unit Price: 18 Quantity: 15 
+Order number 10835:
+Product Name: Raclette Courdavault Unit Price: 55 Quantity: 15 
+Product Name: Original Frankfurter grüne Soße Unit Price: 13 Quantity: 2 
+Order number 10952:
+Product Name: Grandma's Boysenberry Spread Unit Price: 25 Quantity: 16 
+Product Name: Rössle Sauerkraut Unit Price: 45.6 Quantity: 2 
+Order number 11011:
+Product Name: Escargots de Bourgogne Unit Price: 13.25 Quantity: 40 
+Product Name: Flotemysost Unit Price: 21.5 Quantity: 20 
+
+Ex5.3
+
+Using the same query as in previous exercise we displayed only those orders of ALFKI, which contains at least 2 product types, by means of Python. The output is shown below:
+
+5.3
+Order number 10643:
+Product Name: Rössle Sauerkraut Unit Price: 45.6 Quantity: 15 
+Product Name: Chartreuse verte Unit Price: 18 Quantity: 21 
+Product Name: Spegesild Unit Price: 12 Quantity: 2 
+Order number 10702:
+Product Name: Aniseed Syrup Unit Price: 10 Quantity: 6 
+Product Name: Lakkalikööri Unit Price: 18 Quantity: 15 
+Order number 10835:
+Product Name: Raclette Courdavault Unit Price: 55 Quantity: 15 
+Product Name: Original Frankfurter grüne Soße Unit Price: 13 Quantity: 2 
+Order number 10952:
+Product Name: Grandma's Boysenberry Spread Unit Price: 25 Quantity: 16 
+Product Name: Rössle Sauerkraut Unit Price: 45.6 Quantity: 2 
+Order number 11011:
+Product Name: Escargots de Bourgogne Unit Price: 13.25 Quantity: 40 
+Product Name: Flotemysost Unit Price: 21.5 Quantity: 20 
+
+Ex5.4
+
+The SQL query looks like the following:
+
+SELECT e.FirstName, e.LastName FROM Employees e JOIN Orders o ON e.EmployeeID = o.EmployeeID JOIN "Order Details" od ON o.OrderID = od.OrderID JOIN Products p ON od.ProductID = p.ProductID WHERE p.ProductID = 7
+
+With the aid of above query's results and our Python script we found out how many products of ID = 7 have been ordered by each of the people. The output, in a form of dictionary, is as follows:
+
+5.4
+{'Janet Leverling': {'how_many_7': 1}, 'Nancy Davolio': {'how_many_7': 7}, 'Robert King': {'how_many_7': 1}, 'Margaret Peacock': {'how_many_7': 5}, 'Michael Suyama': {'how_many_7': 2}, 'Laura Callahan': {'how_many_7': 7}, 'Steven Buchanan': {'how_many_7': 1}, 'Andrew Fuller': {'how_many_7': 5}}
+
+Ex5.5
+
+Having retrieved the names of people, who ordered Uncle Bob’s Organic Dried Pears, we extended the dictionary from the previous exercise by a new key, showing the number of different produts they ordered. We constructed the following SQL query:
+
+SELECT e.FirstName, e.LastName, COUNT(DISTINCT p.ProductID) FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID GROUP BY e.FirstName, e.LastName
+
+And we got the new version of our dictionary:
+
+5.5
+{'Janet Leverling': {'how_many_7': 1, 'how_many_different_products': 74}, 'Nancy Davolio': {'how_many_7': 7, 'how_many_different_products': 72}, 'Robert King': {'how_many_7': 1, 'how_many_different_products': 67}, 'Margaret Peacock': {'how_many_7': 5, 'how_many_different_products': 75}, 'Michael Suyama': {'how_many_7': 2, 'how_many_different_products': 57}, 'Laura Callahan': {'how_many_7': 7, 'how_many_different_products': 70}, 'Steven Buchanan': {'how_many_7': 1, 'how_many_different_products': 52}, 'Andrew Fuller': {'how_many_7': 5, 'how_many_different_products': 68}}
+
+'how_many_7' key stands for: “how many products of ID = 7 has the person ordered”, whilst 'how_many_different_products” means: “how many different products can be found in the person's order”.
+
+The next part of the exercise, finding out which products have been taken, was done by us by means of the following SQL query:
+
+SELECT DISTINCT p.ProductName FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID WHERE e.FirstName = "{name}" AND e.LastName = "{surname}"
+
+
+First name and last name of the employee is parametrised by Python. The final version of the dictionary after executing the SQL query, shown above, looks as the following:
+
+{'Janet Leverling': {'how_many_7': 1, 'how_many_different_products': 74, 'products_ordered': ["Gustaf's Knäckebröd", 'Ravioli Angelo', 'Louisiana Fiery Hot Pepper Sauce', 'Gorgonzola Telino', 'Chartreuse verte', 'Maxilaku', 'Perth Pasties', 'Original Frankfurter grüne Soße', 'Queso Manchego La Pastora', 'Ikura', 'Geitost', 'Boston Crab Meat', 'Lakkalikööri', 'Genen Shouyu', 'Teatime Chocolate Biscuits', 'Camembert Pierrot', 'Mozzarella di Giovanni', "Chef Anton's Cajun Seasoning", "Grandma's Boysenberry Spread", 'Singaporean Hokkien Fried Mee', 'Ipoh Coffee', 'Flotemysost', 'Steeleye Stout', 'Gumbär Gummibärchen', 'Carnarvon Tigers', 'Zaanse koeken', 'Alice Mutton', 'Gnocchi di nonna Alice', 'Guaraná Fantástica', 'Tourtière', 'NuNuCa Nuß-Nougat-Creme', 'Manjimup Dried Apples', 'Queso Cabrales', 'Tofu', 'Longlife Tofu', "Sir Rodney's Marmalade", 'Konbu', "Sir Rodney's Scones", 'Raclette Courdavault', 'Chai', 'Tarte au sucre', 'Mishi Kobe Niku', 'Outback Lager', 'Röd Kaviar', 'Valkoinen suklaa', 'Vegie-spread', 'Spegesild', 'Wimmers gute Semmelknödel', 'Rhönbräu Klosterbier', 'Sasquatch Ale', 'Schoggi Schokolade', 'Louisiana Hot Spiced Okra', "Jack's New England Clam Chowder", 'Filo Mix', 'Nord-Ost Matjeshering', 'Côte de Blaye', 'Tunnbröd', 'Rössle Sauerkraut', "Sirop d'érable", 'Aniseed Syrup', 'Scottish Longbreads', 'Mascarpone Fabioli', 'Inlagd Sill', 'Pavlova', 'Gula Malacca', 'Escargots de Bourgogne', 'Rogede sild', 'Gudbrandsdalsost', 'Thüringer Rostbratwurst', 'Chang', 'Chocolade', 'Laughing Lumberjack Lager', 'Pâté chinois', "Uncle Bob's Organic Dried Pears"]},... output too long to show}}
+
+Ex5.6
+
+Firstly, we created a list carrying all the products ordered by anyone from the group of our consideration. Additionally, we filled in the next list, supposed to carry total quantities of all the products, forming the list mentioned before. To do this, we executed the following SQL query:
+
+SELECT od.Quantity FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID WHERE e.FirstName = "{name}" AND e.LastName="{surname}" AND p.ProductName = "{product}"
+
+Having both lists, we printed the most popular product with its quantity:
+
+
+5.6
+Escargots de Bourgogne 309
+
+Ex5.7
+
+We modified a little exercise 5.2 – a new list containing all the product types which ALFKI ordered has been created. Then we executed the following SQL query:
+
+SELECT DISTINCT pr.ProductName, e.FirstName, e.LastName  FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID
+
+Next operations were to create a list of lists, connecting a person with the set of products he ordered. Afterwards, we created “a similarity ranking”, a list in which we saved one's name together with the number of products he has in common with ALFKI. Finally, we presented the similarity ranking, starting from the biggest degree of similarity:
+
+5.7
+Margaret Peacock 75
+Janet Leverling 74
+Nancy Davolio 72
+Laura Callahan 70
+Andrew Fuller 68
+Robert King 67
+Michael Suyama 57
+Anne Dodsworth 53
+Steven Buchanan 52
+
+Therefore, we know that Margaret Peacock has ordered the most similar goods to ALFKI.
+
+
+
+APPENDIX A
+
+This section contains Python code for the whole sql part of week 5.
+
+import sqlite3 as lite
+#5.1
+print("5.1")
+con = lite.connect('/home/kmalarski/Desktop/DTU/bigdata/tfbd/w5/northwind.db')
+con.text_factory = lambda x: str(x, 'latin1')
+cur = con.cursor()
+with con:
+    # some queries, just to confirm that we have connection
+    cur.execute("SELECT LastName, FirstName FROM Employees")
+    print(cur.fetchall())
+    cur.execute("SELECT * FROM Employees WHERE EmployeeID = 1")
+    print(cur.fetchone())
+    cur.execute("SELECT FirstName FROM Employees ORDER BY FirstName ASC")
+    print(cur.fetchall())
+#5.2
+print("5.2")
+cur.execute('SELECT pr.ProductName, od.UnitPrice, od.Quantity, od.OrderID  FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID WHERE o.CustomerID = "ALFKI"')
+results = cur.fetchall()
+alfki_product_list = []  # this list will be needed for 5.7
+cur_order_id = 0
+for row in results:
+    if row[-1] == cur_order_id:  # if it's still the same order, we go on printing...
+        print("Product Name: {} Unit Price: {} Quantity: {} ".format(row[0], row[1], row[2]))
+    else:  # ...unless it's new one - time to print new order number as well.
+        print("Order number {}:".format(row[-1]))
+        print("Product Name: {} Unit Price: {} Quantity: {} ".format(row[0], row[1], row[2]))
+        cur_order_id = row[-1]
+    alfki_product_list.append(row[0])
+print()
+#5.3
+print("5.3")
+cur.execute('SELECT pr.ProductName, od.UnitPrice, od.Quantity, od.OrderID FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID WHERE o.CustomerID = "ALFKI"')
+results = cur.fetchall()
+cur_order_id = 0
+cur_order = []
+for row in results:
+    if row[-1] == cur_order_id:
+        cur_order.append(row)
+    else:
+        if len(cur_order) > 1:
+            print("Order number {}:".format(cur_order_id))
+            for record in cur_order:
+                print("Product Name: {} Unit Price: {} Quantity: {} ".format(record[0], record[1], record[2]))
+        cur_order_id = row[-1]
+        cur_order = [row]
+if len(cur_order) > 1:
+            print("Order number {}:".format(cur_order_id))
+            for record in cur_order:
+                print("Product Name: {} Unit Price: {} Quantity: {} ".format(record[0], record[1], record[2]))
+#5.4
+print("5.4")
+cur.execute('SELECT e.FirstName, e.LastName FROM Employees e JOIN Orders o ON e.EmployeeID = o.EmployeeID JOIN "Order Details" od ON o.OrderID = od.OrderID JOIN Products p ON od.ProductID = p.ProductID WHERE p.ProductID = 7')
+results = cur.fetchall()
+people_dict = {}
+how_many = 0
+for record in results:
+    person = record[0] + ' ' + record[1]  # e.g: John Smith
+    if person not in people_dict.keys():
+        people_dict[person] = {'how_many_7': 1}  # first occurrence, at least one product
+    else:
+        people_dict[person]['how_many_7'] += 1
+print(people_dict)
+#5.5
+print("5.5")
+#how many different
+cur.execute('SELECT e.FirstName, e.LastName, COUNT(DISTINCT p.ProductID) FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID GROUP BY e.FirstName, e.LastName')
+results = cur.fetchall()
+for record in results:
+    person = record[0] + ' ' + record[1]
+    if person in people_dict.keys():
+        people_dict[person]['how_many_different_products'] = record[2]
+print(people_dict)
+#which
+for human in people_dict.keys():
+    cur.execute('SELECT DISTINCT p.ProductName FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID WHERE e.FirstName = "{name}" AND e.LastName = "{surname}"'.format(name=human.split()[0], surname=human.split()[1]))
+    people_dict[human]['products_ordered'] = [product[0] for product in cur.fetchall()]
+print(people_dict)
+#5.6
+print("5.6")
+#filling product_list with all products ordered by any of those people
+product_list = []
+for human in people_dict.keys():
+    for product in people_dict[human]['products_ordered']:
+        if product not in product_list:
+            product_list.append(product)
+quantity_list = [0] * len(product_list)  #  a list carrying amounts of each product ordered
+i = 0
+for product in product_list:
+    for human in people_dict.keys():
+            cur.execute('SELECT od.Quantity FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID WHERE e.FirstName = "{name}" AND e.LastName="{surname}" AND p.ProductName = "{product}"'.format(name=human.split()[0], surname=human.split()[1], product=product))
+            result = cur.fetchone()
+            if result is not None:
+                quantity_list[i] += int(result[0])  # for each product we count how many items did each human do and aggregate the results in quantity_list
+    i += 1
+print(product_list[quantity_list.index(max(quantity_list))], quantity_list[quantity_list.index(max(quantity_list))])  # since we are interested in the most popular product
+
+#5.7
+print("5.7")
+cur.execute('SELECT DISTINCT pr.ProductName, e.FirstName, e.LastName  FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID')
+results = cur.fetchall()
+people_products = []
+def in_people_products(person):
+    """
+    Check whether a certain person is already mentioned in the people_products list.
+    :param person:
+    :return:
+    """
+    for person_list in people_products:
+        if person in person_list:
+            return True
+    return False
+for result in results:
+    person = result[1] + ' ' + result[2]
+    if people_products == [] or in_people_products(person) == False:
+        people_products.append([person, result[0]])  # e.g. ['John Smith', 'apple', 'banana', 'peach'...]
+    else:
+        for human in people_products:
+            if human[0] == person:
+                human.append(result[0])
+similarity_ranking = []
+def check_similarity(person_list):
+    """
+    The more products one has in common with ALFKI, the more similar his orderings are to him.
+    :param person_list:
+    :return:
+    """
+    products_in_common = 0
+    for product in person_list:
+        products_in_common += 1
+    return products_in_common
+for person in people_products:
+     similarity_ranking.append([person[0], check_similarity(person[1:])])
+similarity_ranking = sorted(similarity_ranking, key=lambda x: x[1], reverse=True)  # from the most similar towards least similar
+for record in similarity_ranking:
+    print(record[0], record[1])
+

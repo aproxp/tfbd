@@ -1,6 +1,8 @@
+#!/usr/bin/python3
+
 points = []
 
-with open("/home/kmalarski/Desktop/DTU/bigdata/list.txt") as file:
+with open("list.txt") as file:
     for line in file:
         points.append(line.strip().split(' '))
 
@@ -18,7 +20,9 @@ poly = numpy.polyfit(x, y, 3)
 def f(x, a, b, c, d):
     return a*x**3 + b*x**2 + c*x + d
 
+print('The coeficients are ' + str(poly))
+
 root = scipy.optimize.root(f, 8, args=(poly[0], poly[1], poly[2], poly[3]))
 
-print(root)
+print('The root is x = ' + str(root.x))
 

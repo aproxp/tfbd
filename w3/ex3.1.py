@@ -8,7 +8,7 @@ __author__ = 'kmalarski'
 import numpy
 
 results = []
-with open("/home/kmalarski/Desktop/DTU/bigdata/matrix.txt") as inputfile:
+with open("matrix.txt") as inputfile:
     for line in inputfile:
         results.append(line.strip().split(','))
 

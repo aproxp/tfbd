@@ -39,52 +39,42 @@ print()
 
 #5.3
 print("5.3")
-cur.execute('SELECT pr.ProductName, od.UnitPrice, od.Quantity, od.OrderID FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID WHERE o.CustomerID = "ALFKI"')
-results = cur.fetchall()
-cur_order_id = 0
-cur_order = []
-for row in results:
-    if row[-1] == cur_order_id:
-        cur_order.append(row)
-    else:
-        if len(cur_order) > 1:
-            print("Order number {}:".format(cur_order_id))
-            for record in cur_order:
-                print("Product Name: {} Unit Price: {} Quantity: {} ".format(record[0], record[1], record[2]))
-        cur_order_id = row[-1]
-        cur_order = [row]
-if len(cur_order) > 1:
-            print("Order number {}:".format(cur_order_id))
-            for record in cur_order:
-                print("Product Name: {} Unit Price: {} Quantity: {} ".format(record[0], record[1], record[2]))
+cur.execute('SELECT od.OrderID FROM "Order Details" od LEFT JOIN Products pr ON pr.ProductID = od.ProductID LEFT JOIN Orders o ON od.OrderID = o.OrderID WHERE o.CustomerID = "ALFKI" GROUP BY o.OrderID HAVING COUNT(DISTINCT pr.ProductID) >= 2')
+orders = [order[0] for order in cur.fetchall()]
+for order in orders:
+    cur.execute('SELECT pr.ProductName FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID WHERE od.OrderID = {order}'.format(order=order))
+    print("Order ID: {} , products: {}".format(order, cur.fetchall()))
+
+print()
 
 #5.4
 print("5.4")
-cur.execute('SELECT e.FirstName, e.LastName FROM Employees e JOIN Orders o ON e.EmployeeID = o.EmployeeID JOIN "Order Details" od ON o.OrderID = od.OrderID JOIN Products p ON od.ProductID = p.ProductID WHERE p.ProductID = 7')
+cur.execute('SELECT c.ContactName FROM Customers c JOIN Orders o ON c.CustomerID = o.CustomerID JOIN "Order Details" od ON o.OrderID = od.OrderID JOIN Products p ON od.ProductID = p.ProductID WHERE p.ProductID = 7')
 results = cur.fetchall()
 people_dict = {}
 how_many = 0
 for record in results:
-    person = record[0] + ' ' + record[1]  # e.g: John Smith
+    person = record[0]  # e.g: John Smith
     if person not in people_dict.keys():
         people_dict[person] = {'how_many_7': 1}  # first occurrence, at least one product
     else:
         people_dict[person]['how_many_7'] += 1
+print(len(people_dict))
 print(people_dict)
 
 #5.5
 print("5.5")
 #how many different
-cur.execute('SELECT e.FirstName, e.LastName, COUNT(DISTINCT p.ProductID) FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID GROUP BY e.FirstName, e.LastName')
+cur.execute('SELECT c.ContactName, COUNT(DISTINCT p.ProductID) FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Customers c ON o.CustomerID = c.CustomerID GROUP BY c.ContactName')
 results = cur.fetchall()
 for record in results:
-    person = record[0] + ' ' + record[1]
+    person = record[0]
     if person in people_dict.keys():
-        people_dict[person]['how_many_different_products'] = record[2]
+        people_dict[person]['how_many_different_products'] = record[1]
 print(people_dict)
 #which
 for human in people_dict.keys():
-    cur.execute('SELECT DISTINCT p.ProductName FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID WHERE e.FirstName = "{name}" AND e.LastName = "{surname}"'.format(name=human.split()[0], surname=human.split()[1]))
+    cur.execute('SELECT DISTINCT p.ProductName FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Customers c ON o.CustomerID = c.CustomerID WHERE c.ContactName = "{name}"'.format(name=human))
     people_dict[human]['products_ordered'] = [product[0] for product in cur.fetchall()]
 print(people_dict)
 
@@ -98,9 +88,10 @@ for human in people_dict.keys():
             product_list.append(product)
 quantity_list = [0] * len(product_list)  #  a list carrying amounts of each product ordered
 i = 0
+print("FOR 5.5: There were {} different products.".format(len(product_list)))
 for product in product_list:
     for human in people_dict.keys():
-            cur.execute('SELECT od.Quantity FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID WHERE e.FirstName = "{name}" AND e.LastName="{surname}" AND p.ProductName = "{product}"'.format(name=human.split()[0], surname=human.split()[1], product=product))
+            cur.execute('SELECT od.Quantity FROM Products p JOIN "Order Details" od ON p.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Customers c ON o.CustomerID = c.CustomerID WHERE c.ContactName = "{name}" AND p.ProductName = "{product}"'.format(name=human, product=product))
             result = cur.fetchone()
             if result is not None:
                 quantity_list[i] += int(result[0])  # for each product we count how many items did each human do and aggregate the results in quantity_list
@@ -111,7 +102,7 @@ print(product_list[quantity_list.index(max(quantity_list))], quantity_list[quant
 #5.7
 print("5.7")
 
-cur.execute('SELECT DISTINCT pr.ProductName, e.FirstName, e.LastName  FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Employees e ON o.EmployeeID = e.EmployeeID')
+cur.execute('SELECT DISTINCT pr.ProductName, c.CompanyName FROM Products pr JOIN "Order Details" od ON pr.ProductID = od.ProductID JOIN Orders o ON od.OrderID = o.OrderID JOIN Customers c ON o.CustomerID = c.CustomerID WHERE c.CustomerID <> "ALFKI"')
 results = cur.fetchall()
 people_products = []
 
@@ -127,7 +118,7 @@ def in_people_products(person):
     return False
 
 for result in results:
-    person = result[1] + ' ' + result[2]
+    person = result[1]
     if people_products == [] or in_people_products(person) == False:
         people_products.append([person, result[0]])  # e.g. ['John Smith', 'apple', 'banana', 'peach'...]
     else:
@@ -145,7 +136,8 @@ def check_similarity(person_list):
     """
     products_in_common = 0
     for product in person_list:
-        products_in_common += 1
+        if product in alfki_product_list:
+            products_in_common += 1
     return products_in_common
 
 for person in people_products:

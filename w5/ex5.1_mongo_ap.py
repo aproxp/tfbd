@@ -6,6 +6,8 @@ client = MongoClient()
 
 db = client['Northwind']
 
-collection = db['Products']
+collection = db['products']
 
 print(collection)
+
+collection.

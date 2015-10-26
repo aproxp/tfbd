@@ -7,7 +7,7 @@ import sqlite3 as lite
 
 #5.1
 print("5.1")
-con = lite.connect('/home/kmalarski/Desktop/DTU/bigdata/tfbd/w5/northwind.db')
+con = lite.connect('northwind.db')
 con.text_factory = lambda x: str(x, 'latin1')
 cur = con.cursor()
 with con:
